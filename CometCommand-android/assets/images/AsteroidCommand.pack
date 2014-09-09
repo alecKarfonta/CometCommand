@@ -1,0 +1,117 @@
+
+AsteroidCommand.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+asteroidVesta
+  rotate: false
+  xy: 1284, 588
+  size: 516, 425
+  orig: 516, 425
+  offset: 0, 0
+  index: -1
+earth
+  rotate: false
+  xy: 1544, 331
+  size: 255, 255
+  orig: 255, 255
+  offset: 0, 0
+  index: -1
+earthShield
+  rotate: false
+  xy: 522, 36
+  size: 255, 255
+  orig: 255, 255
+  offset: 0, 0
+  index: -1
+healthGaugeBorder
+  rotate: false
+  xy: 1802, 992
+  size: 178, 21
+  orig: 178, 21
+  offset: 0, 0
+  index: -1
+healthGaugeInfill
+  rotate: false
+  xy: 2, 13
+  size: 173, 13
+  orig: 173, 13
+  offset: 0, 0
+  index: -1
+itsFullOfStars
+  rotate: false
+  xy: 2, 293
+  size: 1280, 720
+  orig: 1280, 720
+  offset: 0, 0
+  index: -1
+laser1Blue
+  rotate: false
+  xy: 1802, 981
+  size: 19, 9
+  orig: 19, 9
+  offset: 0, 0
+  index: -1
+laser1Green
+  rotate: false
+  xy: 779, 278
+  size: 18, 13
+  orig: 18, 13
+  offset: 0, 0
+  index: -1
+laser1Purple
+  rotate: false
+  xy: 1982, 1004
+  size: 19, 9
+  orig: 19, 9
+  offset: 0, 0
+  index: -1
+laser1Red
+  rotate: false
+  xy: 2, 2
+  size: 19, 9
+  orig: 19, 9
+  offset: 0, 0
+  index: -1
+laser1Teal
+  rotate: false
+  xy: 779, 257
+  size: 9, 19
+  orig: 9, 19
+  offset: 0, 0
+  index: -1
+laser1Yellow
+  rotate: false
+  xy: 177, 17
+  size: 19, 9
+  orig: 19, 9
+  offset: 0, 0
+  index: -1
+laserGaugeInfill
+  rotate: false
+  xy: 1284, 308
+  size: 173, 13
+  orig: 173, 13
+  offset: 0, 0
+  index: -1
+moon
+  rotate: false
+  xy: 2, 28
+  size: 258, 263
+  orig: 258, 263
+  offset: 0, 0
+  index: -1
+moonBlue
+  rotate: false
+  xy: 1284, 323
+  size: 258, 263
+  orig: 258, 263
+  offset: 0, 0
+  index: -1
+moonRed
+  rotate: false
+  xy: 262, 28
+  size: 258, 263
+  orig: 258, 263
+  offset: 0, 0
+  index: -1
