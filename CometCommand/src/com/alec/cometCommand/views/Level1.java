@@ -159,6 +159,7 @@ public class Level1 extends AbstractGameScreen {
 		height = Gdx.graphics.getHeight();
 	}
 
+	// init input
 	public void createGameListener() {
 		// input listener
 		InputAdapter input = new InputAdapter() {
@@ -294,12 +295,14 @@ public class Level1 extends AbstractGameScreen {
 		inputPlexer.addProcessor(stage);
 	}
 
+	// make the level specific stuff
 	public void createLevel() {
 		Gdx.app.debug(TAG, "createLevel()");
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
-		isFiringLaser = isUsingAccelerometer; // no regen in this mode
+		isFiringLaser = isUsingAccelerometer; // when using accelerometer, lasers always active
 
+		// background
 		background = new Sprite(Assets.instance.levelDecorations.background);
 		float backgroundWidth = 5 * -Constants.VIEWPORT_WIDTH;
 		float backgroundHeight = 5 * -Constants.VIEWPORT_HEIGHT;
@@ -308,6 +311,7 @@ public class Level1 extends AbstractGameScreen {
 		background.setOrigin(backgroundWidth / 2 - 50,
 				backgroundHeight / 2 - 50);
 
+		// arrays
 		asteroids = new Array<Asteroid>();
 		asteroidFactory = new AsteroidFactory(world);
 		asteroidPool = new AsteroidPool(asteroidFactory);
@@ -316,14 +320,17 @@ public class Level1 extends AbstractGameScreen {
 		cometDeaths = new Array<CometDeath>();
 		cometFactory = new CometFactory(world);
 		cometPool = new CometPool(cometFactory);
+		
+		// earth
 		earth = new Earth(world);
 		healthGauge = new Gauge(earthHealth, -width / 2, height / 2 - 15,
 				Assets.instance.ui.healthGaugeInfill);
-		// laserGauge = new Gauge(laserHealth, -width / 2, height / 2 - 20,
-		// Assets.instance.ui.laserGaugeInfill);
+		// laserGauge = new Gauge(laserHealth, -width / 2, height / 2 - 20, Assets.instance.ui.laserGaugeInfill);
 		laserDefense = new LaserDefense[4];
 
 		moon = new Moon(world);
+		
+		// this is what the lasers come out of
 		createLaserDefence();
 	}
 
@@ -355,6 +362,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// spawn each wave of asteroids and comets
 	private void createWave(int level) {
 		
 		Vector2 initialPosition;
@@ -425,6 +433,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// create stats window on start
 	private void createStatsWindow() {
 		winStats = new Window("GameOver", skin, "big");
 		Table table = new Table(skin);
@@ -458,6 +467,16 @@ public class Level1 extends AbstractGameScreen {
 
 	}
 
+	// show stats window on lose
+	private void showStatsWindow(boolean visible) {
+		float alphaTo = visible ? 0.8f : 0.0f;
+		Touchable touchEnabled = visible ? Touchable.enabled
+				: Touchable.disabled;
+		winStats.addAction(sequence(touchable(touchEnabled),
+				alpha(alphaTo, .5f)));
+	}
+	
+	// not used
 	private void createPowerUpButtons() {
 		TextButton tbGravityWave = new TextButton("Gravity Wave", skin, "small");
 		tbGravityWave.pad(10);
@@ -504,14 +523,6 @@ public class Level1 extends AbstractGameScreen {
 		mainTable.addActor(table);
 
 	}
-
-	private void showStatsWindow(boolean visible) {
-		float alphaTo = visible ? 0.8f : 0.0f;
-		Touchable touchEnabled = visible ? Touchable.enabled
-				: Touchable.disabled;
-		winStats.addAction(sequence(touchable(touchEnabled),
-				alpha(alphaTo, .5f)));
-	}
 	
 	// update
 	@Override
@@ -540,14 +551,15 @@ public class Level1 extends AbstractGameScreen {
 		}
 
 		cameraHelper.update(delta);
-		cameraHelper.applyTo(gameCamera);
+		cameraHelper.applyTo(gameCamera);	// only move/zoom the game camera
+		
 		renderUI(delta);
 		renderGame(delta);
 
 		if (isDebug) {
 			debugRenderer.render(world, gameCamera.combined);
 		}
-
+		// destroy any bodies at the end of all updates and drawing
 		destroyQueue();
 	}
 	
@@ -602,48 +614,52 @@ public class Level1 extends AbstractGameScreen {
 		/**/
 	}
 
+	// draw game
 	private void renderGame(float delta) {
 		// ** render game elements
 		spriteBatch.setProjectionMatrix(gameCamera.combined);
 		spriteBatch.begin();
 
+		// background
 		backgroundRotation += (delta / 4);
 		background.setRotation(backgroundRotation);
 		background.draw(spriteBatch);
 
+		// earth
 		earth.render(spriteBatch, delta);
 		moon.update(delta);
 		moon.render(spriteBatch);
 
-		// update and draw asteroid
+		// asteroid
 		for (Asteroid asteroid : asteroids) {
 			if (!isPaused) {
 				asteroid.update(delta);
 			}
 			asteroid.render(spriteBatch);
 		}
-
+		// asteroid explosions
 		for (AsteroidDeath asteroidDeath : asteroidDeaths) {
 			asteroidDeath.render(spriteBatch, delta);
 			if (asteroidDeath.shouldDestroy()) {
 				asteroidDeaths.removeValue(asteroidDeath, true);
 			}
 		}
-
+		// comets
 		for (Comet comet : comets) {
 			if (!isPaused)
 				comet.update(delta);
 			comet.render(spriteBatch, delta);
 
 		}
-
+		// comet explosions
 		for (CometDeath cometDeath : cometDeaths) {
 			cometDeath.render(spriteBatch, delta);
 			if (cometDeath.shouldDestroy()) {
 				cometDeaths.removeValue(cometDeath, true);
 			}
 		}
-
+		
+		// lasers
 		laserDefense[0].render(spriteBatch);
 		laserDefense[1].render(spriteBatch);
 		laserDefense[2].render(spriteBatch);
@@ -652,6 +668,7 @@ public class Level1 extends AbstractGameScreen {
 		spriteBatch.end();
 	}
 
+	// draw ui
 	private void renderUI(float delta) {
 		stage.act(delta);
 		stage.draw();
@@ -661,12 +678,14 @@ public class Level1 extends AbstractGameScreen {
 		spriteBatch.setProjectionMatrix(guiCamera.combined);
 		spriteBatch.begin();
 
+		// score
 		lblScore.setText("Score: " + score);
 
+		// health
 		healthGauge.render(spriteBatch, earthHealth);
 		// laserGauge.render(spriteBatch, laserHealth);
 
-
+		// fps
 		if (GamePreferences.instance.showFpsCounter) {
 			int fps = Gdx.graphics.getFramesPerSecond();
 			float x = -width / 2;
@@ -683,6 +702,7 @@ public class Level1 extends AbstractGameScreen {
 			fpsFont.setColor(Color.WHITE);
 		}
 
+		// debug stats
 		if (isDebug) {
 			renderDebugStats();
 		}
@@ -690,6 +710,7 @@ public class Level1 extends AbstractGameScreen {
 		spriteBatch.end();
 	}
 
+	// debug info
 	private void renderDebugStats() {
 		if (isDebug) {
 			// draw number of asteroids in play, at bottom right
@@ -738,6 +759,7 @@ public class Level1 extends AbstractGameScreen {
 	}
 
 	// collisions
+	/// laser - asteroid : increment score by 1, blow up asteroid
 	public void collisionLaserAsteroid(Asteroid asteroid) {
 		if (!asteroid.isDead) {
 			asteroid.isDead = true;
@@ -753,7 +775,8 @@ public class Level1 extends AbstractGameScreen {
 			destroyAsteroid(asteroid);
 		}
 	}
-
+	
+	// asteroid - earth : lower earth health proportional to asteroid size, destroy asteroid
 	public void collisionAsteroidEarth(Asteroid asteroid) {
 		if (!asteroid.isDead) {
 			asteroid.isDead = true;
@@ -765,6 +788,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// laser - comet : increment score by 10, destroy comet
 	public void collisionLaserComet(Comet comet) {
 		if (!comet.isDead) {
 			comet.isDead = true;
@@ -781,6 +805,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// comet - earth : lower earth health by 10, destroy comet
 	public void collisionCometEarth(Comet comet) {
 		if (!comet.isDead) {
 			comet.isDead = true;
@@ -792,6 +817,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// comet - moon : destroy comet
 	public void collisionCometMoon(Comet comet) {
 		if (!comet.isDead) {
 			comets.removeValue(comet, true);
@@ -804,6 +830,7 @@ public class Level1 extends AbstractGameScreen {
 
 	public void earthDamage(float amount) {
 		earthHealth -= amount;
+		// check for lose
 		if (earthHealth < 0) {
 			earthHealth = 0;
 			onGameOver();
@@ -811,7 +838,7 @@ public class Level1 extends AbstractGameScreen {
 		// Gdx.input.vibrate(250);
 	}
 
-	// earth powers
+	// not used
 	public void gravityWave() {
 		Gdx.app.debug(TAG, "gravityWave()");
 		// force vector polar
@@ -839,7 +866,7 @@ public class Level1 extends AbstractGameScreen {
 					false);
 		}
 	}
-
+	// not used
 	public void moonPull() {
 		Gdx.app.debug(TAG, "moonPull()");
 		// force vector polar
@@ -879,7 +906,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
-	// animate
+	// animate text on bonus apply
 	public void animateBonus(float delta) {
 		bonusAnimationStateTime += delta;
 		if (bonusAnimationStateTime < bonusAnimationLength) {
@@ -894,7 +921,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 	
-	// destroy stuff
+	// add body to destroy queue
 	public void destroyBody(Body body) {
 		// be sure the body you are trying to destroy is not already in the
 		// queue
@@ -902,6 +929,7 @@ public class Level1 extends AbstractGameScreen {
 			destroyQueue.add(body);
 	}
 
+	// destroy queue at a safe time
 	private void destroyQueue() {
 		if (!destroyQueue.isEmpty()) {
 			Gdx.app.debug(TAG, "destroy(): destroying queue");
@@ -912,6 +940,7 @@ public class Level1 extends AbstractGameScreen {
 		}
 	}
 
+	// destroy asteroid and play explosion particles effect
 	public void destroyAsteroid(Asteroid asteroid) {
 		Gdx.app.debug(TAG, "destroyAsteroid()");
 		try {
@@ -926,7 +955,8 @@ public class Level1 extends AbstractGameScreen {
 		}
 
 	}
-
+	
+	// destroy comet and play explosion particles effect same color as comet
 	public void destroyComet(Comet comet) {
 		Gdx.app.debug(TAG, "destroyComet()");
 		try {
@@ -943,6 +973,7 @@ public class Level1 extends AbstractGameScreen {
 
 	@Override
 	public void resize(int width, int height) {
+		// not right..
 		Gdx.app.debug(TAG, "resize() - " + width + " " + height);
 		this.width = width;
 		this.height = height;
