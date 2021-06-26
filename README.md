@@ -1,7 +1,6 @@
 CometCommand
 ============
-This is the source code for my game Comet Command. It is written in Java using the Libgdx framework and Box2d physics engine. 
-It uses the latest version of Libgdx, including the Gradle build system. So it should be easy to import 
+This is the source code for my game Comet Command. It is written in Java using the Libgdx framework and Box2d physics engine.
 
 If anyone feels like adding a feature to the app on Google Play, email me and I will push your branch. 
 
